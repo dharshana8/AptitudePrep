@@ -1,14 +1,29 @@
 import 'dotenv/config';
+import dns from 'dns';
 import express from 'express';
 import cors from 'cors';
 import { MongoClient, ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
-const app = express();
-const PORT = 8888;
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore in environments where setServers is restricted
+}
 
-app.use(cors());
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(cors({
+  origin: process.env.CLIENT_URL || '*',
+  credentials: true
+}));
 app.use(express.json());
+
+// Health check route for AWS EC2 / Nginx
+app.get(['/health', '/api/health', '/functions/health'], (req, res) => {
+  res.json({ status: 'ok', message: 'Aptitude Prep API is running' });
+});
 
 // MongoDB connection
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/aptitude-prep';

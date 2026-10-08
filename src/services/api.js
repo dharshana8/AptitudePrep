@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_URL || '/functions';
+
 export const api = axios.create({
-  baseURL: '/.netlify/functions',
+  baseURL,
   timeout: 30000,
 });
 
